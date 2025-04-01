@@ -11,10 +11,62 @@ class RegisterTest extends TestCase
 {
     use RefreshDatabase;
     
-    
-    public function test_email_has_correct_format(){
+    public function test_name_is_too_long(){
+        
+        $userData= $this->makeUserwithDataToTest(['name'=> 'lukeiamyourfatherlukeiamyourfather']);
+        $response = $this->postJson('/api/register', $userData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['name']);
+    }
+
+
+    public function test_name_is_empty(){
+        
+        $userData= $this->makeUserwithDataToTest(['name'=>'']);
+        $response = $this->postJson('/api/register', $userData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['name']);
+    }
+
+    public function test_surname_is_empty(){
+        $userData= $this->makeUserwithDataToTest(['surname'=>'']);
+        $response = $this->postJson('/api/register', $userData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['surname']);
+    }
+
+    public function test_surname_is_too_long(){
+        
+        $userData= $this->makeUserwithDataToTest(['surname'=>'iwilltrytobeaseriouspersonforthisonebutimnotgonnamakeit']);
+        $response = $this->postJson('/api/register', $userData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['surname']);
+    }
+
+    public function test_username_is_not_unique(){
         $user= User::factory()->create();
-        $userData= $user->toArray();
+        $userData= $this->makeUserwithDataToTest(['username' => $user->username]);
+        $response = $this->postJson('/api/register', $userData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['username']);
+    }
+
+    public function test_username_is_empty(){
+        $userData= $this->makeUserwithDataToTest(['username' => '']);
+        $response = $this->postJson('/api/register', $userData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['username']);
+    }
+
+
+    public function test_email_has_correct_format(){
+        $userData= $this->makeUserwithDataToTest(['email'=> 'usuario@hotmail.com']);
         $response = $this->postJson('/api/register', $userData);
 
         $response->assertStatus(201);
@@ -25,9 +77,7 @@ class RegisterTest extends TestCase
 
     public function test_email_fails_with_incorrect_format($email): void
     {   
-        $user= User::factory()->make();
-        $userData= $user->toArray();
-        $userData ['email']= $email;
+        $userData= $this->makeUserwithDataToTest(['email'=> $email]);
         $response = $this->postJson('/api/register', $userData);
 
         $response->assertStatus(422);
@@ -37,14 +87,39 @@ class RegisterTest extends TestCase
     public function test_email_is_not_unique_in_database(){
 
         $user= User::factory()->create();
-        $userToTest= User::factory()->make();
-        $userData= $userToTest->toArray();
-        $userData ['email']= $user->email;
+        $userData= $this->makeUserwithDataToTest(['email'=> $user->email]);
         $response= $this->postJson('/api/register', $userData);
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['email']);
 
+    }
+
+    public function test_telephone_is_empty (){
+        $userData= $this->makeUserwithDataToTest(['telephone'=> '']);
+        $response= $this->postJson('/api/register', $userData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['telephone']);
+    }
+
+    public function test_password_is_empty(){
+        $userData= $this->makeUserwithDataToTest(['password'=> '', 'password_confirmed'=> '']);
+        $response= $this->postJson('/api/register', $userData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['password']);
+    }
+/**
+ * @dataProvider invalidPassword
+ */
+    public function test_password_has_invalid_format($password){
+
+        $userData= $this->makeUserwithDataToTest(['password'=> $password, 'password_confirmed'=>$password]);
+        $response= $this->postJson('/api/register', $userData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['password']);
 
     }
 
@@ -58,5 +133,19 @@ class RegisterTest extends TestCase
             'empty'=> ['']
 
         ];
+    }
+
+    public static function invalidPassword(){
+        return [
+            'short'=> ['user'],
+            'long'=>['mypasswordiscorrect123456789']
+        ];
+    }
+
+    private function makeUserwithDataToTest($newData){
+        $user= User::factory()->make();
+        $userData= array_merge($user->toArray(), $newData);
+
+        return $userData;
     }
 }
