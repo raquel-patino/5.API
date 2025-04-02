@@ -6,11 +6,12 @@ use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class RegisterTest extends TestCase
 {
     use RefreshDatabase;
-    
+    //tests de datos nullable pendientes si hay tiempo
     public function test_name_is_too_long(){
         
         $userData= $this->makeUserwithDataToTest(['name'=> 'lukeiamyourfatherlukeiamyourfather']);
@@ -71,9 +72,8 @@ class RegisterTest extends TestCase
 
         $response->assertStatus(201);
     }
-    /**
-     * @dataProvider invalidEmails
-     */
+    
+    #[DataProvider('invalidEmails')]
 
     public function test_email_fails_with_incorrect_format($email): void
     {   
@@ -110,9 +110,9 @@ class RegisterTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['password']);
     }
-/**
- * @dataProvider invalidPassword
- */
+
+    #[DataProvider('invalidPassword')]
+    
     public function test_password_has_invalid_format($password){
 
         $userData= $this->makeUserwithDataToTest(['password'=> $password, 'password_confirmed'=>$password]);
@@ -123,6 +123,15 @@ class RegisterTest extends TestCase
 
     }
 
+    public function test_user_is_saved_in_database(){
+        $user= User::factory()->make();
+        $userValid= $user->toArray();
+        $$this->postJson('/api/register', $userValid);
+        $this->assertDatabaseHas('users', ['email'=> $userValid ['email']]);
+        
+    }
+
+    
     public static function invalidEmails(){
 
         return [
