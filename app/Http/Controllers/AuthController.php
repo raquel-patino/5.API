@@ -6,8 +6,8 @@ use App\Models\User;
 use Laravel\Passport\Token;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\ModifyProfileRequest;
 
 class AuthController extends Controller
 {
@@ -45,6 +45,34 @@ class AuthController extends Controller
     
         return response()->json(['message' => 'Invalid credentials'], 401);
        
+    }
+
+    public function checkProfile(){
+
+        $user= Auth::user();
+       
+        return response()->json([
+            'email'=> $user->email,
+            'telephone'=>$user->telephone,
+            'username'=>$user->username,
+            'street_type'=>$user->street_type,
+            'street_name'=>$user->street_name,
+            'message'=> 'user can check profile'
+        ], 200);
 
     }
+
+    public function modifyProfile(ModifyProfileRequest $request){
+
+        $validatedData= $request->validated();
+        $user=Auth::user();
+        $user->update($validatedData);
+
+        return response()->json([
+            'data'=> $user,
+            'message'=> 'User has been modified'
+        ]);
+    }
 }
+
+

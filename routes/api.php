@@ -7,12 +7,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
-/*
-Route::get('/test', function () {
-    return response()->json(['status' => 'OK']);
-});
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:api');
-*/
+Route::middleware('auth:api')->group(function(){
+    Route::get('/users',[AuthController::class, 'checkProfile']);
+    Route::put('/users',[AuthController::class, 'modifyProfile']);
+});
