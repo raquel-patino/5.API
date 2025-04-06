@@ -22,7 +22,18 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'email'=> 'required|email:rfc',
+            'password'=> 'required|between:8,20'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'password.required'=> 'You must enter a valid password',
+            'password.between'=> 'Password should be between 8 and 20 characters',
+            'email.required'=>'You must enter a valid email',
+            'email.email'=> 'Email format is not valid',
         ];
     }
 }
