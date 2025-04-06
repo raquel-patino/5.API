@@ -26,6 +26,11 @@ class RegisterRequest extends FormRequest
             'surname'=> 'required|max:50',
             'username'=> 'required|unique:users',
             'email'=> 'required|email:rfc|unique:users',
+            'street_type' =>'nullable',
+            'street_name'=>'nullable',
+            'postcode'=>'nullable',
+            'city'=> 'nullable',
+            'country'=>'nullable',
             'telephone'=> 'required',
             'password'=> 'required|between:8,20|confirmed'
         ]; 
