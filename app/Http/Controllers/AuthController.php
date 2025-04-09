@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\User;
 use Laravel\Passport\Token;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\LogoutRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ModifyProfileRequest;
 
@@ -66,13 +69,46 @@ class AuthController extends Controller
 
         $validatedData= $request->validated();
         $user=Auth::user();
+        
+        try{
         $user->update($validatedData);
-
         return response()->json([
             'data'=> $user,
             'message'=> 'User has been modified'
         ]);
+        }catch (Exception $e){
+            return response()->json([
+                'message' => 'User failed modification',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+        
+    public function logout(LogoutRequest $request){
+        $validatedData= $request->validated();
+        $user= Auth::user();
+
+        if (($validatedData['email'] == $user->email) && (Hash::check($validatedData['password'], $user->password))){
+        $user->token()->revoke();
+        $user->token()->delete();
+        return response()->json([
+            'message'=> 'User is logged out'
+        ],200);
+    }else {
+        return response()->json([
+           // 'message'=> 'User is not correct'
+       ],500);
+    }
+
+    }
+
+
+    public function deleteProfile(){
+
+
+    }
+
+    
 }
 
 
