@@ -47,8 +47,43 @@ class LogoutTest extends TestCase
     #[DataProvider('invalidPassword')]
     public function test_password_is_not_valid($password){
 
+        $this->seed(\Database\Seeders\PassportSeeder::class);
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->accessToken;
+        
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+                         ->postJson('/api/logout', ['email'=> $user->email, 'password' => $password]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['password']);
+
     }
 
+    public function test_password_is_valid_but_not_corresponding(){
+
+        $this->seed(\Database\Seeders\PassportSeeder::class);
+        $user = User::factory()->create(['password'=> bcrypt('1234abcd')]);
+        $token = $user->createToken('TestToken')->accessToken;
+        
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+                         ->postJson('/api/logout', ['email'=> $user->email, 'password' =>'1234efgh']);
+
+        $response->assertStatus(500);
+
+    }
+
+    public function test_email_is_valid_but_not_corresponding(){
+
+        $this->seed(\Database\Seeders\PassportSeeder::class);
+        $user = User::factory()->create(['password'=> bcrypt('1234abcd')]);
+        $token = $user->createToken('TestToken')->accessToken;
+        
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+                         ->postJson('/api/logout', ['email'=> 'example@gmail.com', 'password' =>'1234abcd']);
+
+        $response->assertStatus(500);
+
+    }
 
 
     public static function invalidEmails(){

@@ -88,17 +88,17 @@ class AuthController extends Controller
         $validatedData= $request->validated();
         $user= Auth::user();
 
-        if (($validatedData['email'] == $user->email) && (Hash::check($validatedData['password'], $user->password))){
+    if (($validatedData['email'] == $user->email) && (Hash::check($validatedData['password'], $user->password))){
         $user->token()->revoke();
         $user->token()->delete();
-        return response()->json([
+            return response()->json([
             'message'=> 'User is logged out'
-        ],200);
+             ],200);
     }else {
-        return response()->json([
-           // 'message'=> 'User is not correct'
-       ],500);
-    }
+            return response()->json([
+                'message'=> 'User is not correct'
+             ],500);
+        }
 
     }
 
