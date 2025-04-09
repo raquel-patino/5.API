@@ -12,4 +12,5 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/users',[AuthController::class, 'checkProfile']);
     Route::put('/users',[AuthController::class, 'modifyProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::delete('/users', [AuthController::class, 'deleteProfile']);
 });

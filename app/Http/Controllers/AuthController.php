@@ -84,26 +84,24 @@ class AuthController extends Controller
         }
     }
         
-    public function logout(LogoutRequest $request){
-        $validatedData= $request->validated();
+    public function logout(){
         $user= Auth::user();
+        $token= $user->token();
 
-    if (($validatedData['email'] == $user->email) && (Hash::check($validatedData['password'], $user->password))){
-        $user->token()->revoke();
-        $user->token()->delete();
-            return response()->json([
-            'message'=> 'User is logged out'
-             ],200);
-    }else {
-            return response()->json([
-                'message'=> 'User is not correct'
-             ],500);
+        if ($token) {
+            $token->revoke();
+            $token->delete();
         }
+    
+        return response()->json([
+            'message' => 'User is logged out'
+        ], 200);
 
     }
 
 
     public function deleteProfile(){
+
 
 
     }
