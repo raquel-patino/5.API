@@ -102,8 +102,21 @@ class AuthController extends Controller
 
     public function deleteProfile(){
 
+        $user= Auth::user();
+        $token= $user->token();
+            if($token){
+                $token->revoke();
+                $token->delete();
+        }else{
+            return response()->json()([
+                "message"=> "The user is not authenticated"
+            ], 401);
+        }
 
-
+        $user->delete();
+        return response()->json([
+            "message"=> "The user has deleted his/her profile",
+        ], 200);
     }
 
     

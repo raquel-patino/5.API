@@ -17,7 +17,15 @@ class HotelFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+        'name'=> fake()->city(). 'Hotel',
+        'description'=> fake()->realText(200),
+        'street_type'=> fake()->streetSuffix(),
+        'street_name'=>fake()->streetName(),
+        'number'=>fake()->numberBetween(0, 100),
+        'postcode'=>fake()->postcode(),
+        'city'=>fake()->city(),
+        'country'=>fake()->country(),
+        'telephone_number'=>fake()->phoneNumber(),
         ];
     }
 }
