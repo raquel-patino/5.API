@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,4 +14,5 @@ Route::middleware('auth:api')->group(function(){
     Route::put('/users',[AuthController::class, 'modifyProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::delete('/users', [AuthController::class, 'deleteProfile']);
+    Route::post('/reservations', [ReservationController::class, 'create']);
 });
