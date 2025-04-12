@@ -16,8 +16,11 @@ class RoomFactory extends Factory
      */
     public function definition(): array
     {
+        $roomTypes= ['double', 'superior','suite'];
         return [
-            //
+            'type'=> $roomTypes[rand(0,2)],
+            'price'=> fake()->numberBetween(100,200),
+            'description'=>fake()->text(200),
         ];
     }
 }
