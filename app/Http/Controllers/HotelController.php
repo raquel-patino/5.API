@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Hotel;
-
+use Exception;
 
 class HotelController extends Controller
 {
@@ -20,7 +20,8 @@ class HotelController extends Controller
 
     public function getRooms($hotelId){
 
-        $hotel= Hotel::find($hotelId);
+    try{
+        $hotel= Hotel::findOrFail($hotelId);
 
         $rooms= $hotel->rooms;
         
@@ -28,5 +29,13 @@ class HotelController extends Controller
             "message"=> "Rooms retrieved successfully",
             "available_rooms"=> $rooms,
         ], 200);
+    }catch(Exception $e){
+        return response()->json([
+            'message'=> 'Id is not valid',
+            'error'=> $e->getMessage()
+        ], 404);
+        
+    }
+
     }
 }

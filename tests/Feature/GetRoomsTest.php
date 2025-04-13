@@ -27,4 +27,17 @@ class GetRoomsTest extends TestCase
         $response->assertStatus(200);
         $response->dump();
     }
+
+    public function test_id_doesnt_exists(){
+        $this->seed(HotelSeeder::class);
+        $this->seed(RoomSeeder::class);
+        $user= User::factory()->create();
+        Passport::actingAs($user, [], 'api');
+
+        $response = $this->getJson('/api/hotels/3/rooms');
+
+        $response->assertStatus(404);
+        $response->dump();
+
+    }
 }
