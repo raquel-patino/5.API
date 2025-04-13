@@ -17,4 +17,16 @@ class HotelController extends Controller
         ], 200);
         
     }
+
+    public function getRooms($hotelId){
+
+        $hotel= Hotel::find($hotelId);
+
+        $rooms= $hotel->rooms;
+        
+        return response()->json([
+            "message"=> "Rooms retrieved successfully",
+            "available_rooms"=> $rooms,
+        ], 200);
+    }
 }

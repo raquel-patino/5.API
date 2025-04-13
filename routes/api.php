@@ -16,5 +16,6 @@ Route::middleware('auth:api')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::delete('/users', [AuthController::class, 'deleteProfile']);
     Route::get('/hotels', [HotelController::class, 'read']);
+    Route::get('/hotels/{id}/rooms', [HotelController::class, 'getRooms']);
     Route::post('/reservations', [ReservationController::class, 'create']);
 });
