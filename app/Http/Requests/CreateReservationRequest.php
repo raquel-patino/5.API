@@ -27,7 +27,6 @@ class CreateReservationRequest extends FormRequest
             'number_guests' => 'required|integer|min:1|max:3',
             'hotel_id' => 'required|exists:hotels,id',
             'room_id' => 'required|exists:rooms,id',
-            'user_id' => 'required|exists:users,id',
         ];      
     }
 
@@ -48,8 +47,6 @@ class CreateReservationRequest extends FormRequest
             'hotel_id.exists' => 'Hotel ID must exist in the hotels table.',
             'room_id.required' => 'Room ID is required.',
             'room_id.exists' => 'Room ID must exist in the rooms table.',
-            'user_id.required' => 'User ID is required.',
-            'user_id.exists' => 'User ID must exist in the users table.'
         ];
     }
 }
