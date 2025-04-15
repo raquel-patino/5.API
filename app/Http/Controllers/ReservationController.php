@@ -22,6 +22,22 @@ class ReservationController extends Controller
         ], 201);
     }
 
+    public function show()
+    {
+        $user= Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $reservations= $user->reservations;
+        if ($reservations->isEmpty()) {
+            return response()->json(['message' => 'No reservations found'], 404);
+        }
+
+        return response()->json([
+            "message"=> "Reservations retrieved succesfully",
+            "reservations"=> $reservations]
+        , 200);
+    }
 
     
     private function calculatePrice($roomId, $checkIn, $checkOut)
