@@ -18,4 +18,5 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/hotels', [HotelController::class, 'read']);
     Route::get('/hotels/{id}/rooms', [HotelController::class, 'getRooms']);
     Route::post('/reservations', [ReservationController::class, 'create']);
+    Route::get('/reservations', [ReservationController::class, 'show']);
 });

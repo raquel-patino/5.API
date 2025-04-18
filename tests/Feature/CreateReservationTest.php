@@ -27,8 +27,6 @@ class CreateReservationTest extends TestCase
             'check_in'=> '2025-05-02',
             'check_out'=> '2025-05-04',
             'number_guests'=> 2,
-            'price'=> 150,
-            'user_id'=> $user->id,
             'hotel_id' =>$room->hotel_id,
             'room_id'=> $room->id,
         ]);
