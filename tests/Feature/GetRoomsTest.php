@@ -22,10 +22,10 @@ class GetRoomsTest extends TestCase
         $user= User::factory()->create();
         Passport::actingAs($user, [], 'api');
 
-        $response = $this->getJson('/api/hotels/1/rooms');
+        $response = $this->getJson('/api/hotels/1/rooms?check_in=2025-05-23&check_out=2025-05-28');
 
         $response->assertStatus(200);
-        $response->dump();
+       
     }
 
     public function test_id_doesnt_exists(){
@@ -34,10 +34,10 @@ class GetRoomsTest extends TestCase
         $user= User::factory()->create();
         Passport::actingAs($user, [], 'api');
 
-        $response = $this->getJson('/api/hotels/3/rooms');
+        $response = $this->getJson('/api/hotels/3/rooms?check_in=2025-05-23&check_out=2025-05-28');
 
         $response->assertStatus(404);
-        $response->dump();
+       
 
     }
 }
