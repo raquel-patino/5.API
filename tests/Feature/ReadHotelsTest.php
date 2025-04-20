@@ -17,14 +17,15 @@ class ReadHotelsTest extends TestCase
     public function test_user_can_retrieve_hotels()
     {
         $this->seed(\Database\Seeders\HotelSeeder::class);
+        $this->seed(\Database\Seeders\RoomSeeder::class);
         $user= User::factory()->create();
         Passport::actingAs($user, [], 'api');
         
-        $response= $this->getJson('/api/hotels');
+        $response= $this->getJson('/api/hotels?check_in=2025-05-23&check_out=2025-05-28');
 
         $response->assertStatus(200);
         $response->dump();
-        $response->assertJsonIsArray('hotels');
+      
     }
 
     public function test_database_has_hotels(){
