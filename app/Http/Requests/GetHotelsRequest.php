@@ -24,14 +24,14 @@ class GetHotelsRequest extends FormRequest
         return [
             'check_in'=>'required|date|after_or_equal:today',   
             'check_out'=>'required|date|after:check_in',
-            'place'=>'string|nullable',
+            'country'=>'string|nullable',
         ];
     }
 
     public function messages()
     {
         return [
-            'place.string' => 'Place must be a string.',
+            'country.string' => 'Place must be a string.',
             'check_in.required' => 'Check-in date is required.',
             'check_in.date' => 'Check-in date must be a valid date.',
             'check_in.after_or_equal' => 'Check-in date must be today or later.',
