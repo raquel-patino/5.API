@@ -6,6 +6,9 @@ use App\Models\Room;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CreateReservationRequest;
+use Illuminate\Support\Facades\Gate;
+
+
 
 class ReservationController extends Controller
 {
@@ -37,6 +40,20 @@ class ReservationController extends Controller
             "message"=> "Reservations retrieved succesfully",
             "reservations"=> $reservations]
         , 200);
+    }
+
+    public function delete($reservationId ){
+        
+        $reservation= Reservation::findOrFail($reservationId);
+        Gate::authorize('delete', $reservation);
+        
+        $reservation->delete();
+
+
+        return response()->json([
+            "message"=> 'Reservation cancelled successfully',
+        ], 200);
+
     }
 
     
