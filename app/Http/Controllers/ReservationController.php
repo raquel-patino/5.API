@@ -6,11 +6,22 @@ use App\Models\Room;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CreateReservationRequest;
+use App\Http\Requests\UpdateReservationRequest;
+use Illuminate\Support\Facades\Gate;
+
+
 
 class ReservationController extends Controller
 {
     public function create(CreateReservationRequest $request){
         $validatedData= $request->validated();
+
+        if (!$this->isRoomAvailable($validatedData['room_id'], $validatedData['check_in'], $validatedData['check_out'])) {
+            return response()->json([
+                'error' => 'The selected room is not available for those dates.'
+            ], 409); 
+        }
+
         $reservation= Reservation::make($validatedData);
         $reservation->price= $this->calculatePrice($validatedData['room_id'], $validatedData['check_in'], $validatedData['check_out']);
         $reservation->user_id= Auth::user()->id;
@@ -39,6 +50,52 @@ class ReservationController extends Controller
         , 200);
     }
 
+    public function update(UpdateReservationRequest $request, $reservationId){
+
+    $validatedData= $request->validated();
+
+    $reservation= Reservation::findOrFail($reservationId);
+    Gate::authorize('update', $reservation);
+
+    $checkIn = $validatedData['check_in'] ?? $reservation->check_in;
+    $checkOut = $validatedData['check_out'] ?? $reservation->check_out;
+    $roomId = $validatedData['room_id'] ?? $reservation->room_id;
+
+    
+    if (!$this->isRoomAvailable($roomId, $checkIn, $checkOut, $reservation->id)) {
+        return response()->json([
+            'error' => 'The selected room is not available for those dates.'
+        ], 409);
+    }
+
+    foreach($validatedData as $key=>$data){
+        if($data !== null){
+            $reservation[$key] = $data;
+        }
+    }
+    $reservation->save();
+
+    return response()->json([
+        "updated reservation" => $reservation,
+        "message"=> "Update successful"
+    ],200);
+
+    }
+
+    public function delete($reservationId ){
+        
+        $reservation= Reservation::findOrFail($reservationId);
+        Gate::authorize('delete', $reservation);
+        
+        $reservation->delete();
+
+
+        return response()->json([
+            "message"=> 'Reservation cancelled successfully',
+        ], 200);
+
+    }
+
     
     private function calculatePrice($roomId, $checkIn, $checkOut)
     {
@@ -54,4 +111,18 @@ class ReservationController extends Controller
 
         return $totalPrice;
     }
+
+    private function isRoomAvailable($roomId, $checkIn, $checkOut, $excludedReservationId = null)
+    {
+        return !Reservation::where('room_id', $roomId)
+            ->where('id', '!=', $excludedReservationId) 
+            ->where(function ($query) use ($checkIn, $checkOut) {
+                $query->where('check_in', '<', $checkOut)
+                      ->where('check_out', '>', $checkIn);
+            })
+            ->exists();
+    }
+    
+
 }
+
