@@ -3,8 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Middleware\EnsureUserIsAdmin;
 
 
 Route::post('register', [AuthController::class, 'register']);
@@ -22,3 +24,13 @@ Route::middleware('auth:api')->group(function(){
     Route::delete('/reservations/{id}', [ReservationController::class, 'delete']);
     Route::put('/reservations/{id}', [ReservationController::class, 'update']);
 });
+
+
+
+Route::middleware([EnsureUserIsAdmin::class])->group(function(){
+    Route::get('/admin/users', [AdminController::class, 'index']);
+});
+   
+
+
+
