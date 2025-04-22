@@ -24,10 +24,23 @@ class AdminTest extends TestCase
         $user->save();
         Passport::actingAs($user);
 
-        $response = $this->get('api/admin/users');
+        $response = $this->getJson('api/admin/users');
 
         $response->assertStatus(200);
     }
 
+    public function test_admin_can_change_rol(){
 
+        $admin= User::factory()->make();
+        $admin['user_type'] = 'admin';
+        $admin->save();
+        Passport::actingAs($admin);
+
+        $user= User::factory()->create();
+
+        $response = $this->patchJson("api/admin/users/{$user->id}");
+
+        $response->assertStatus(200);
+    }
+    
 }
