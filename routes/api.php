@@ -29,7 +29,7 @@ Route::middleware('auth:api')->group(function(){
 
 Route::middleware(['auth:api', EnsureUserIsAdmin::class])->group(function(){
     Route::get('/admin/users', [AdminController::class, 'index']);
-    Route::patch('/admin/users/{id}', [AdminController::class, 'changeRol']);
+    Route::patch('/admin/users/{id}/role', [AdminController::class, 'changeRol']);
 });
    
 
