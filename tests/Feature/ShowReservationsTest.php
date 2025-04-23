@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\Room;
 use App\Models\User;
-use Laravel\Passport\Passport;
 
+use App\Models\Reservation;
+use Laravel\Passport\Passport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ShowReservationsTest extends TestCase
@@ -19,9 +21,15 @@ class ShowReservationsTest extends TestCase
         $this->seed(\Database\Seeders\HotelSeeder::class);
         $this->seed(\Database\Seeders\RoomSeeder::class);
         
-        $response = $this->getJson('api/reservations');
+     
+       $room=Room::first();
        $user= User::factory()->create();
        Passport::actingAs($user); 
+       $reservation= Reservation::factory()->make();
+       $reservation ['room_id']= $room->id;
+       $reservation['hotel_id'] =$room->hotel_id;
+       $reservation ['user_id']= $user->id;
+       $reservation->save();
        
        $response= $this->getJson('api/reservations');
 

@@ -8,51 +8,45 @@ use App\Models\Room;
 use App\Models\Hotel;
 use App\Models\Reservation;
 use App\Http\Requests\GetHotelsRequest;
+use App\Services\HotelService;
+use App\Services\RoomAvailabilityService;
+
 
 class HotelController extends Controller
 {
-    public function getHotels(GetHotelsRequest $request){
-
-        $validatedData= $request->validated();
-        
-        $hotels= $this->getHotelsByCountry($validatedData['country'] ?? null);
-        $responseHotelsEmpty= $this->abortIfHotelsIsEmpty($hotels);
-        if ($responseHotelsEmpty) {
-            return $responseHotelsEmpty;
-        }
-
-        $checkIn= Carbon::parse($validatedData['check_in']);
-        $checkOut=Carbon::parse($validatedData['check_out']);
-      
-        $occupiedRooms= $this->getCollectionOccupiedRooms($hotels, $checkIn, $checkOut);
-        $availableRooms= $this->searchAvailableRoomsByHotel($hotels, $occupiedRooms);
-
+    public function getHotels(GetHotelsRequest $request) {
+        $validated = $request->validated();
+        $checkIn = Carbon::parse($validated['check_in']);
+        $checkOut = Carbon::parse($validated['check_out']);
+    
+        $hotels = HotelService::getHotelsByCountry($validated['country'] ?? null);
+        if ($response = HotelService::abortIfHotelsIsEmpty($hotels)) return $response;
+    
+        $occupiedRooms = RoomAvailabilityService::getCollectionOccupiedRooms($hotels, $checkIn, $checkOut);
+        $availableRooms = RoomAvailabilityService::searchAvailableRoomsByHotel($hotels, $occupiedRooms);
         $availableHotels = Hotel::findMany(array_keys($availableRooms->toArray()));
-        
+    
         return response()->json([
-            'Available hotels'=> $availableHotels,
-            'message'=> 'Hotels retrieved successfully'
+            'Available hotels' => $availableHotels,
+            'message' => 'Hotels retrieved successfully'
         ], 200);
-        
     }
 
-public function getRooms(GetHotelsRequest $request, $hotelId){
-
-    $validatedData= $request->validated();
-    $checkIn= Carbon::parse($validatedData['check_in']);
-    $checkOut=Carbon::parse($validatedData['check_out']);
-
-        $hotel= Hotel::findOrFail($hotelId);
-        $roomsId= $this->getOccupiedRoomsIds($hotel,$checkIn, $checkOut);
-        $availableRooms= $this->getAvailableRooms($hotelId, $roomsId);
-  
-    return response()->json([
-            "message"=> "Rooms retrieved successfully",
-            "available_rooms"=> $availableRooms,
+    public function getRooms(GetHotelsRequest $request, $hotelId) {
+        $validated = $request->validated();
+        $checkIn = Carbon::parse($validated['check_in']);
+        $checkOut = Carbon::parse($validated['check_out']);
+    
+        $hotel = Hotel::findOrFail($hotelId);
+        $occupiedRoomIds = RoomAvailabilityService::getOccupiedRoomsIds($hotel, $checkIn, $checkOut);
+        $availableRooms = RoomAvailabilityService::getAvailableRooms($hotelId, $occupiedRoomIds);
+    
+        return response()->json([
+            "message" => "Rooms retrieved successfully",
+            "available_rooms" => $availableRooms,
         ], 200);
-        
     }
-
+/*
     private function getOccupiedRoomsIds($hotel, $checkIn, $checkOut){
         $roomsId=[];
         $reservations= $hotel->reservations;
@@ -114,7 +108,7 @@ public function getRooms(GetHotelsRequest $request, $hotelId){
 
         return $availableRooms;
     }
-
+*/
     
         
     
