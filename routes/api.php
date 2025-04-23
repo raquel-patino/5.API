@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Middleware\EnsureUserIsAdmin;
 
@@ -23,6 +24,7 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/reservations', [ReservationController::class, 'show']);
     Route::delete('/reservations/{id}', [ReservationController::class, 'delete']);
     Route::put('/reservations/{id}', [ReservationController::class, 'update']);
+    Route::get('/invoices/reservations/{id}', [InvoiceController::class, 'downloadInvoice']);
 });
 
 
