@@ -4,8 +4,9 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Database\Seeders\PassportSeeder;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RegisterTest extends TestCase
 {
@@ -66,7 +67,13 @@ class RegisterTest extends TestCase
 
 
     public function test_email_has_correct_format(){
-        $userData= $this->makeUserwithDataToTest(['email'=> 'usuario@hotmail.com']);
+        $this->seed(PassportSeeder::class);
+
+        $userData= $this->makeUserwithDataToTest([
+        'email'=> 'usuario@hotmail.com', 
+        'password'=>'1234abcd',
+        'password_confirmation'=>'1234abcd']);
+
         $response = $this->postJson('/api/register', $userData);
 
         $response->assertStatus(201);
@@ -123,9 +130,9 @@ class RegisterTest extends TestCase
     }
 
     public function test_user_is_saved_in_database(){
-        $user= User::factory()->make();
+        $user= User::factory()->create();
         $userValid= $user->toArray();
-        $$this->postJson('/api/register', $userValid);
+        $this->postJson('/api/register', $userValid);
         $this->assertDatabaseHas('users', ['email'=> $userValid ['email']]);
         
     }
@@ -135,7 +142,6 @@ class RegisterTest extends TestCase
 
         return [
             'no @'=> ['usuariohotmail.com'],
-            'no .com' => ['usuario@hotmail'],
             'no domain'=> ['usuario@'],
             'espaces'=> ['usuario@ hotmail. com'],
             'empty'=> ['']

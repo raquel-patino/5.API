@@ -38,8 +38,9 @@ class AdminTest extends TestCase
 
         $user= User::factory()->create();
 
-        $response = $this->patchJson("api/admin/users/{$user->id}");
+        $response = $this->patchJson("api/admin/users/{$user->id}/role", ['user_type'=> 'admin']);
 
+        $response->dump();
         $response->assertStatus(200);
     }
     

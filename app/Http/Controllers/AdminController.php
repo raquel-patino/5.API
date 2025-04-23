@@ -11,7 +11,7 @@ class AdminController extends Controller
 
     public function index()
 {
-    $users =User::pagiate(10); 
+    $users =User::paginate(10); 
 
     return response()->json([
         'message' => 'Users retrieved successfully',
