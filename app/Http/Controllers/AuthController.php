@@ -50,7 +50,7 @@ class AuthController extends Controller
        
     }
 
-    public function checkProfile(){
+    public function index(){
 
         $user= Auth::user();
        
@@ -65,7 +65,7 @@ class AuthController extends Controller
 
     }
 
-    public function modifyProfile(ModifyProfileRequest $request){
+    public function update(ModifyProfileRequest $request){
 
         $validatedData= $request->validated();
         $user=Auth::user();
@@ -100,7 +100,7 @@ class AuthController extends Controller
     }
 
 
-    public function deleteProfile(){
+    public function destroy(){
 
         $user= Auth::user();
         $token= $user->token();
