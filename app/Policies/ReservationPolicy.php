@@ -21,7 +21,7 @@ class ReservationPolicy
      */
     public function view(User $user, Reservation $reservation): bool
     {
-        return true;
+        return $user->id=== $reservation->user_id;
     }
 
     /**
