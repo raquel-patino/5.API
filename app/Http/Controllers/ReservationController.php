@@ -59,6 +59,7 @@ class ReservationController extends Controller
             "reservations" => $reservations
         ], 200);
     }
+    
 
     public function update(UpdateReservationRequest $request, $reservationId)
     {
@@ -82,6 +83,7 @@ class ReservationController extends Controller
             }
         }
 
+        $reservation->price = ReservationService::calculateReservationPrice($roomId, $checkIn, $checkOut);
         $reservation->save();
 
         return response()->json([

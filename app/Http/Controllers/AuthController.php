@@ -55,11 +55,7 @@ class AuthController extends Controller
         $user= Auth::user();
        
         return response()->json([
-            'email'=> $user->email,
-            'telephone'=>$user->telephone,
-            'username'=>$user->username,
-            'street_type'=>$user->street_type,
-            'street_name'=>$user->street_name,
+            "user"=> $user,
             'message'=> 'user can check profile'
         ], 200);
 
@@ -68,9 +64,14 @@ class AuthController extends Controller
     public function update(ModifyProfileRequest $request){
 
         $validatedData= $request->validated();
+       
         $user=Auth::user();
         
         try{
+        if (!empty($validatedData['password'])) {
+                $user->password = Hash::make($validatedData['password']);
+                unset($validatedData['password']);
+        }
         $user->update($validatedData);
         return response()->json([
             'data'=> $user,
