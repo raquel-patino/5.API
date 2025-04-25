@@ -8,121 +8,98 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CreateReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
 use Illuminate\Support\Facades\Gate;
-
-
+use App\Services\ReservationService;
 
 class ReservationController extends Controller
 {
-    public function create(CreateReservationRequest $request){
-        $validatedData= $request->validated();
+    public function store(CreateReservationRequest $request)
+    {
+        $validatedData = $request->validated();
 
-        if (!$this->isRoomAvailable($validatedData['room_id'], $validatedData['check_in'], $validatedData['check_out'])) {
+        if (!ReservationService::isRoomAvailable($validatedData['room_id'], $validatedData['check_in'], $validatedData['check_out'])) {
             return response()->json([
                 'error' => 'The selected room is not available for those dates.'
-            ], 409); 
+            ], 409);
         }
 
-        $reservation= Reservation::make($validatedData);
-        $reservation->price= $this->calculatePrice($validatedData['room_id'], $validatedData['check_in'], $validatedData['check_out']);
-        $reservation->user_id= Auth::user()->id;
-        $reservation->save();
+        try {
+            $reservation = Reservation::make($validatedData);
+            $reservation->price = ReservationService::calculateReservationPrice(
+                $validatedData['room_id'],
+                $validatedData['check_in'],
+                $validatedData['check_out']
+            );
+            $reservation->user_id = Auth::id();
+            $reservation->save();
 
-        return response()->json([
-            'message'=> 'Reservation created successfully',
-            'reservation'=> $reservation
-        ], 201);
+            return response()->json([
+                'message' => 'Reservation created successfully',
+                'reservation' => $reservation
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
-    public function show()
+    public function index()
     {
-        $user= Auth::user();
+        $user = Auth::user();
         if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        $reservations= $user->reservations;
+
+        $reservations = $user->reservations;
         if ($reservations->isEmpty()) {
             return response()->json(['message' => 'No reservations found'], 404);
         }
 
         return response()->json([
-            "message"=> "Reservations retrieved succesfully",
-            "reservations"=> $reservations]
-        , 200);
+            "message" => "Reservations retrieved successfully",
+            "reservations" => $reservations
+        ], 200);
     }
-
-    public function update(UpdateReservationRequest $request, $reservationId){
-
-    $validatedData= $request->validated();
-
-    $reservation= Reservation::findOrFail($reservationId);
-    Gate::authorize('update', $reservation);
-
-    $checkIn = $validatedData['check_in'] ?? $reservation->check_in;
-    $checkOut = $validatedData['check_out'] ?? $reservation->check_out;
-    $roomId = $validatedData['room_id'] ?? $reservation->room_id;
-
     
-    if (!$this->isRoomAvailable($roomId, $checkIn, $checkOut, $reservation->id)) {
-        return response()->json([
-            'error' => 'The selected room is not available for those dates.'
-        ], 409);
-    }
 
-    foreach($validatedData as $key=>$data){
-        if($data !== null){
-            $reservation[$key] = $data;
+    public function update(UpdateReservationRequest $request, $reservationId)
+    {
+        $validatedData = $request->validated();
+        $reservation = Reservation::findOrFail($reservationId);
+        Gate::authorize('update', $reservation);
+
+        $checkIn = $validatedData['check_in'] ?? $reservation->check_in;
+        $checkOut = $validatedData['check_out'] ?? $reservation->check_out;
+        $roomId = $validatedData['room_id'] ?? $reservation->room_id;
+
+        if (!ReservationService::isRoomAvailable($roomId, $checkIn, $checkOut, $reservation->id)) {
+            return response()->json([
+                'error' => 'The selected room is not available for those dates.'
+            ], 409);
         }
+
+        foreach ($validatedData as $key => $data) {
+            if ($data !== null) {
+                $reservation[$key] = $data;
+            }
+        }
+
+        $reservation->price = ReservationService::calculateReservationPrice($roomId, $checkIn, $checkOut);
+        $reservation->save();
+
+        return response()->json([
+            "updated reservation" => $reservation,
+            "message" => "Update successful"
+        ], 200);
     }
-    $reservation->save();
 
-    return response()->json([
-        "updated reservation" => $reservation,
-        "message"=> "Update successful"
-    ],200);
-
-    }
-
-    public function delete($reservationId ){
-        
-        $reservation= Reservation::findOrFail($reservationId);
+    public function destroy($reservationId)
+    {
+        $reservation = Reservation::findOrFail($reservationId);
         Gate::authorize('delete', $reservation);
-        
         $reservation->delete();
 
-
         return response()->json([
-            "message"=> 'Reservation cancelled successfully',
+            "message" => 'Reservation cancelled successfully',
         ], 200);
-
     }
-
-    
-    private function calculatePrice($roomId, $checkIn, $checkOut)
-    {
-        $room= Room::find($roomId);
-        $pricePerNight= $room->price;
-        if (!$pricePerNight) {
-            return response()->json(['error' => 'Room not found or price not set'], 404);
-        }
-        $checkInDate= \Carbon\Carbon::parse($checkIn);
-        $checkOutDate= \Carbon\Carbon::parse($checkOut);
-        $numberOfNights= $checkInDate->diffInDays($checkOutDate);
-        $totalPrice= $pricePerNight * $numberOfNights;
-
-        return $totalPrice;
-    }
-
-    private function isRoomAvailable($roomId, $checkIn, $checkOut, $excludedReservationId = null)
-    {
-        return !Reservation::where('room_id', $roomId)
-            ->where('id', '!=', $excludedReservationId) 
-            ->where(function ($query) use ($checkIn, $checkOut) {
-                $query->where('check_in', '<', $checkOut)
-                      ->where('check_out', '>', $checkIn);
-            })
-            ->exists();
-    }
-    
-
 }
-

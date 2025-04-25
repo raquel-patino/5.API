@@ -31,7 +31,7 @@ class InvoicesTest extends TestCase
         $reservation ['room_id']= $room->id;
         $reservation ['hotel_id']= $room->hotel_id;
         $reservation->save();
-        $response = $this->get("/api/invoices/reservations/{$reservation->id}");
+        $response = $this->get("/api/reservations/{$reservation->id}/invoices");
 
         $response->assertStatus(200);
     }
@@ -56,7 +56,7 @@ class InvoicesTest extends TestCase
         $reservationTwo ['hotel_id']= $room->hotel_id;
         $reservationTwo->save();
 
-        $response = $this->get("/api/invoices/reservations/{$reservationTwo->id}");
+        $response = $this->get("/api/reservations/{$reservationTwo->id}/invoices");
 
         $response->assertStatus(403);
     }

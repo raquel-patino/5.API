@@ -23,33 +23,27 @@ class ModifyProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'=> 'required|max:30',
-            'surname'=> 'required|max:50',
-            'username' => 'required|unique:users,username,' . Auth::id(),
-            'email'=> 'required|email:rfc,dns|unique:users,email'. Auth::id(),
+            'name'=> 'sometimes|max:30',
+            'surname'=> 'sometimes|max:50',
+            'username' => 'sometimes|unique:users,username,' . Auth::id(),
+            'email'=> 'sometimes|email:rfc,dns|unique:users,email,'. Auth::id(),
             'street_type' =>'nullable',
             'street_name'=>'nullable',
             'postcode'=>'nullable',
             'city'=> 'nullable',
             'country'=>'nullable',
-            'telephone'=> 'required',
-           //password'=> 'required|between:8,20|confirmed'
+            'telephone'=> 'sometimes',
+            'password'=> 'sometimes|between:8,20|confirmed'
         ];
     }
 
     public function messages()
     {
         return [
-            'name.required'=> 'You must enter a valid name',
             'name.max'=> 'Name is too long',
-            'surname.required'=> 'You must enter a valid surname',
             'surname.max'=>'Surname is too long',
-            'username.required'=> 'You must enter a valid username',
             'username.unique'=> 'This username already exists',
-            'email.required'=>'You must enter a valid email',
             'email.email'=> 'Email format is not valid',
-            'telephone.required' =>' You must enter a valid telephone',
-            'password.required'=> 'You must enter a valid password',
             'password.between'=> 'Password should be between 8 and 20 characters',
             'password.confirmed'=> 'Passwords doesn´t match'
         ];

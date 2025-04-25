@@ -19,7 +19,7 @@ class AdminController extends Controller
     ]);
 }
 
-public function changeRole(Request $request, $userId)
+public function update(Request $request, $userId)
 {
     $request->validate([
         'user_type' => 'required|string|in:admin,client'

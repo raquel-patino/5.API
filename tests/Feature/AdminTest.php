@@ -40,7 +40,7 @@ class AdminTest extends TestCase
 
         $response = $this->patchJson("api/admin/users/{$user->id}/role", ['user_type'=> 'admin']);
 
-        $response->dump();
+        
         $response->assertStatus(200);
     }
     

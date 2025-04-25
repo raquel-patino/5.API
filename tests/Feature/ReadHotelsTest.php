@@ -24,7 +24,7 @@ class ReadHotelsTest extends TestCase
         $response= $this->getJson('/api/hotels?check_in=2025-05-23&check_out=2025-05-28');
 
         $response->assertStatus(200);
-        $response->dump();
+       
       
     }
 
