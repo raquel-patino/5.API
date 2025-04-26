@@ -17,23 +17,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         
-        $users = User::factory()->count(3)->create();
-    
-        
-        $hotels = Hotel::factory()->count(3)->create();
-    
-        
-        foreach ($hotels as $hotel) {
-            
-            $rooms = Room::factory()->count(3)->create([
-                'hotel_id' => $hotel->id
-            ]);
-    
-            Reservation::factory()->count(2)->create([
-                'hotel_id' => $hotel->id,
-                'room_id' => $rooms->random()->id,
-                'user_id' => $users->random()->id
+            $this->call([
+                AdminUserSeeder::class,
+                HotelSeeder::class,
+                RoomSeeder::class,
+                PassportSeeder::class,
             ]);
         }
-    }
+    
 }

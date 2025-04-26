@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
@@ -9,8 +10,8 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Middleware\EnsureUserIsAdmin;
 
 
-Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function(){
     Route::get('/users',[AuthController::class, 'index']);
@@ -19,7 +20,7 @@ Route::middleware('auth:api')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/hotels', [HotelController::class, 'index']);
     Route::get('/hotels/{id}/rooms', [HotelController::class, 'getRooms']);
-    Route::resource('reservations', ReservationController::class)->only([
+    Route::resource('/reservations', ReservationController::class)->only([
         'index', 'store', 'update', 'destroy'
     ]);
     Route::get('/reservations/{id}/invoices', [InvoiceController::class, 'downloadInvoice']);
