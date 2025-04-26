@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class RegisterTest extends TestCase
 {
     use RefreshDatabase;
-    //tests de datos nullable pendientes si hay tiempo
+
     public function test_name_is_too_long(){
         
         $userData= $this->makeUserwithDataToTest(['name'=> 'lukeiamyourfatherlukeiamyourfather']);

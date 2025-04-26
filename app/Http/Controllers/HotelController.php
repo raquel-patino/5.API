@@ -14,6 +14,53 @@ use App\Services\RoomAvailabilityService;
 
 class HotelController extends Controller
 {
+
+    /**
+ * @OA\Get(
+ *     path="/hotels",
+ *     summary="Get available hotels by country and dates",
+ *     tags={"Hotels"},
+ *     security={{"Bearer":{}}}, 
+ *     @OA\Parameter(
+ *         name="country",
+ *         in="query",
+ *         description="Country to filter hotels (optional)",
+ *         required=false,
+ *         @OA\Schema(type="string", example="Finlandia")
+ *     ),
+ *     @OA\Parameter(
+ *         name="check_in",
+ *         in="query",
+ *         description="Check-in date",
+ *         required=true,
+ *         @OA\Schema(type="string", format="date", example="2025-06-01")
+ *     ),
+ *     @OA\Parameter(
+ *         name="check_out",
+ *         in="query",
+ *         description="Check-out date",
+ *         required=true,
+ *         @OA\Schema(type="string", format="date", example="2025-06-10")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Available hotels retrieved successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="Available hotels", type="array", @OA\Items(type="object")),
+ *             @OA\Property(property="message", type="string", example="Hotels retrieved successfully")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="No hotels found in the selected location"
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized"
+ *     )
+ * )
+ */
+
     public function index(GetHotelsRequest $request) {
         $validated = $request->validated();
         $checkIn = Carbon::parse($validated['check_in']);
@@ -31,6 +78,51 @@ class HotelController extends Controller
             'message' => 'Hotels retrieved successfully'
         ], 200);
     }
+/**
+ * @OA\Get(
+ *     path="/hotels/{id}/rooms",
+ *     summary="Get available rooms for a hotel by dates",
+ *     tags={"Hotels"},
+ *     security={{"Bearer":{}}},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="ID of the hotel",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Parameter(
+ *         name="check_in",
+ *         in="query",
+ *         description="Check-in date",
+ *         required=true,
+ *         @OA\Schema(type="string", format="date", example="2025-06-01")
+ *     ),
+ *     @OA\Parameter(
+ *         name="check_out",
+ *         in="query",
+ *         description="Check-out date",
+ *         required=true,
+ *         @OA\Schema(type="string", format="date", example="2025-06-10")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Available rooms retrieved successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Rooms retrieved successfully"),
+ *             @OA\Property(property="available_rooms", type="array", @OA\Items(type="object"))
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Hotel not found"
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized"
+ *     )
+ * )
+ */
 
     public function getRooms(GetHotelsRequest $request, $hotelId) {
         $validated = $request->validated();
