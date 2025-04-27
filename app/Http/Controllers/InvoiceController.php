@@ -9,7 +9,7 @@ class InvoiceController extends Controller
 {
 /**
  * @OA\Get(
- *     path="/reservations/{id}/invoice",
+ *     path="/reservations/{id}/invoices",
  *     summary="Download invoice for a reservation",
  *     tags={"Invoices"},
  *     security={{"Bearer":{}}},
