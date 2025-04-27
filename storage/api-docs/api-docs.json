@@ -608,13 +608,13 @@
                 ]
             }
         },
-        "/reservations/{id}/invoice": {
+        "/reservations/{id}/invoices": {
             "get": {
                 "tags": [
                     "Invoices"
                 ],
                 "summary": "Download invoice for a reservation",
-                "operationId": "22025fa1f8104632344357d94da35531",
+                "operationId": "fb1b06ffc57b383d73517975cc706d52",
                 "parameters": [
                     {
                         "name": "id",
