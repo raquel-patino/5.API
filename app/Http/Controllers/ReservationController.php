@@ -92,24 +92,39 @@ class ReservationController extends Controller
  *         response=200,
  *         description="Reservations retrieved successfully",
  *         @OA\JsonContent(
- *             @OA\Property(property="message", type="string", example="Reservations retrieved successfully"),
  *             @OA\Property(
  *                 property="reservations",
  *                 type="array",
- *                 @OA\Items(type="object")
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="id", type="integer", example=1),
+ *                     @OA\Property(property="check_in", type="string", format="date", example="2025-05-01"),
+ *                     @OA\Property(property="check_out", type="string", format="date", example="2025-05-05"),
+ *                     @OA\Property(property="hotel_name", type="string", example="Hotel California"),
+ *                     @OA\Property(property="room_type", type="string", example="Suite"),
+ *                     @OA\Property(property="price", type="number", format="float", example=199.99),
+ *                     @OA\Property(property="hotel_id", type="integer", example=3)
+ *                 )
  *             )
  *         )
  *     ),
  *     @OA\Response(
  *         response=404,
- *         description="No reservations found"
+ *         description="No reservations found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="No reservations found")
+ *         )
  *     ),
  *     @OA\Response(
  *         response=401,
- *         description="Unauthorized"
+ *         description="Unauthorized",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Unauthorized")
+ *         )
  *     )
  * )
  */
+
 
     public function index()
     {
@@ -124,11 +139,28 @@ class ReservationController extends Controller
         }
 
         return response()->json([
+            'reservations' => $user->reservations->map(function ($r) {
+                return [
+                    'id' => $r->id,
+                    'check_in' => $r->check_in,
+                    'check_out' => $r->check_out,
+                    'hotel_name' => $r->hotel->name,
+                    'room_type' => $r->room->type,
+                    'price' => $r->price,
+                    'hotel_id' => $r->hotel_id,
+                ];
+            })
+        ],200);
+    }
+        
+/*
+Metodo modificado para el frontend
+        return response()->json([
             "message" => "Reservations retrieved successfully",
             "reservations" => $reservations
         ], 200);
     }
-    
+    */
 /**
  * @OA\Put(
  *     path="/reservations/{id}",

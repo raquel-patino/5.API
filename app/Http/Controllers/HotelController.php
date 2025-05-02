@@ -65,7 +65,7 @@ class HotelController extends Controller
         $validated = $request->validated();
         $checkIn = Carbon::parse($validated['check_in']);
         $checkOut = Carbon::parse($validated['check_out']);
-    
+
         $hotels = HotelService::getHotelsByCountry($validated['country'] ?? null);
         if ($response = HotelService::abortIfHotelsIsEmpty($hotels)) return $response;
     

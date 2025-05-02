@@ -13,9 +13,6 @@
         {
             "url": "http://127.0.0.1:8000/api",
             "description": "Local server"
-        },
-        {
-            "url": "https://api.example.com"
         }
     ],
     "paths": {
@@ -662,13 +659,42 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Reservations retrieved successfully"
-                                        },
                                         "reservations": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "check_in": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2025-05-01"
+                                                    },
+                                                    "check_out": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2025-05-05"
+                                                    },
+                                                    "hotel_name": {
+                                                        "type": "string",
+                                                        "example": "Hotel California"
+                                                    },
+                                                    "room_type": {
+                                                        "type": "string",
+                                                        "example": "Suite"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 199.99
+                                                    },
+                                                    "hotel_id": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }
@@ -679,10 +705,36 @@
                         }
                     },
                     "404": {
-                        "description": "No reservations found"
+                        "description": "No reservations found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No reservations found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
