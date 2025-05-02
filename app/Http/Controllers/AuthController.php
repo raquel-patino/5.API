@@ -60,7 +60,8 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'User created successfully',
             'user' => $user,
-            'token'=>$token,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
         ], 201);
         
 
@@ -241,24 +242,29 @@ class AuthController extends Controller
  *     )
  * )
  */
-    public function destroy(){
+public function destroy() //metodo modificado para que funcione el front
+{
+    $user = Auth::user();
 
-        $user= Auth::user();
-        $token= $user->token();
-            if($token){
-                $token->revoke();
-                $token->delete();
-        }else{
-            return response()->json()([
-                "message"=> "The user is not authenticated"
-            ], 401);
-        }
-
-        $user->delete();
-        return response()->json([
-            "message"=> "The user has deleted his/her profile",
-        ], 200);
+    if (!$user) {
+        return response()->json(["message" => "No autenticado"], 401);
     }
+
+    // Eliminar reservas asociadas
+    $user->reservations()->delete();
+
+    $token = $user->token();
+    if ($token) {
+        $token->revoke();
+        $token->delete();
+    }
+
+    $user->delete();
+
+    return response()->json([
+        "message" => "El usuario ha eliminado su cuenta",
+    ], 200);
+}
 
     
 }
